@@ -23,6 +23,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    // Strip "use client" directives that Rollup can't handle in library mode.
     {
       name: 'strip-use-client',
       transform(code) {

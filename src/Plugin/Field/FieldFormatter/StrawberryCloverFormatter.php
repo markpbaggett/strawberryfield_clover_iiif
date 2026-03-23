@@ -103,6 +103,7 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
     $settings = parent::defaultSettings();
     unset($settings['hide_on_embargo']);
     return $settings + [
+      // Manifest source.
       'mediasource' => [
         'metadataexposeentity' => 'metadataexposeentity',
       ],
@@ -110,12 +111,36 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
       'metadataexposeentity_source' => NULL,
       'manifesturl_json_key_source' => 'iiifmanifest',
       'manifestnodelist_json_key_source' => 'isrelatedto',
+      // Dimensions.
       'max_width' => 0,
       'max_height' => 600,
       'canvas_height' => '500px',
-      'information_panel' => TRUE,
-      'download_enabled' => TRUE,
-      'background_color' => '#1a1d1e',
+      // Display.
+      'background' => '',
+      'canvas_background_color' => '#1a1d1e',
+      'show_title' => TRUE,
+      'show_iiif_badge' => TRUE,
+      'show_download' => TRUE,
+      // Information panel.
+      'information_panel_open' => TRUE,
+      'information_panel_render_about' => TRUE,
+      'information_panel_render_annotation' => TRUE,
+      'information_panel_render_supplementing' => TRUE,
+      'information_panel_render_content_search' => TRUE,
+      'information_panel_render_toggle' => TRUE,
+      'information_panel_default_tab' => '',
+      // Search.
+      'content_search_enabled' => TRUE,
+      // Network.
+      'cross_origin' => 'anonymous',
+      'with_credentials' => FALSE,
+      'request_headers' => '',
+      // Advanced JSON overrides.
+      'open_seadragon' => '',
+      'annotations_motivations' => '',
+      'ignore_caption_labels' => '',
+      'custom_theme' => '',
+      // Embargo.
       'hide_on_embargo' => FALSE,
     ];
   }
@@ -160,6 +185,10 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
       : reset($options_for_mainsource);
 
     $settings_form = [
+
+      // ----------------------------------------------------------------
+      // Manifest source
+      // ----------------------------------------------------------------
       'mediasource' => [
         '#type' => 'checkboxes',
         '#title' => $this->t('Source for your IIIF Manifest URLs.'),
@@ -207,6 +236,10 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
           'visible' => [':input[data-clover-formatter-selector="mediasource"][value="manifestnodelist"]' => ['checked' => TRUE]],
         ],
       ],
+
+      // ----------------------------------------------------------------
+      // Dimensions
+      // ----------------------------------------------------------------
       'max_width' => [
         '#type' => 'number',
         '#title' => $this->t('Maximum width'),
@@ -230,35 +263,170 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
       ],
       'canvas_height' => [
         '#type' => 'textfield',
-        '#title' => $this->t('Canvas height (Clover canvasHeight option)'),
-        '#description' => $this->t('CSS value controlling the media canvas area, e.g. <em>500px</em> or <em>60vh</em>.'),
+        '#title' => $this->t('Canvas height'),
+        '#description' => $this->t('CSS value for the media canvas area, e.g. <em>500px</em> or <em>60vh</em>. Maps to Clover <code>options.canvasHeight</code>.'),
         '#default_value' => $this->getSetting('canvas_height'),
         '#size' => 10,
         '#required' => TRUE,
       ],
-      'information_panel' => [
-        '#type' => 'checkbox',
-        '#title' => $this->t('Show information panel (metadata, annotations, search tabs)'),
-        '#default_value' => $this->getSetting('information_panel'),
+
+      // ----------------------------------------------------------------
+      // Display
+      // ----------------------------------------------------------------
+      'background' => [
+        '#type' => 'textfield',
+        '#title' => $this->t('Viewer background'),
+        '#description' => $this->t('CSS value for the outer viewer background, e.g. <em>#ffffff</em> or <em>transparent</em>. Maps to <code>options.background</code>. Leave empty for default.'),
+        '#default_value' => $this->getSetting('background'),
+        '#size' => 20,
       ],
-      'download_enabled' => [
-        '#type' => 'checkbox',
-        '#title' => $this->t('Show download button'),
-        '#default_value' => $this->getSetting('download_enabled'),
-      ],
-      'background_color' => [
+      'canvas_background_color' => [
         '#type' => 'textfield',
         '#title' => $this->t('Canvas background color'),
-        '#description' => $this->t('Hex color for the canvas area background, e.g. <em>#1a1d1e</em>.'),
-        '#default_value' => $this->getSetting('background_color'),
+        '#description' => $this->t('Hex color for the canvas area, e.g. <em>#1a1d1e</em>. Maps to <code>options.canvasBackgroundColor</code>.'),
+        '#default_value' => $this->getSetting('canvas_background_color'),
         '#size' => 10,
       ],
+      'show_title' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Show manifest title (<code>options.showTitle</code>)'),
+        '#default_value' => $this->getSetting('show_title'),
+      ],
+      'show_iiif_badge' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Show IIIF badge (<code>options.showIIIFBadge</code>)'),
+        '#default_value' => $this->getSetting('show_iiif_badge'),
+      ],
+      'show_download' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Show download button (<code>options.showDownload</code>)'),
+        '#default_value' => $this->getSetting('show_download'),
+      ],
+
+      // ----------------------------------------------------------------
+      // Information panel
+      // ----------------------------------------------------------------
+      'information_panel_open' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Information panel open by default (<code>options.informationPanel.open</code>)'),
+        '#default_value' => $this->getSetting('information_panel_open'),
+      ],
+      'information_panel_render_toggle' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Show information panel toggle button (<code>options.informationPanel.renderToggle</code>)'),
+        '#default_value' => $this->getSetting('information_panel_render_toggle'),
+      ],
+      'information_panel_render_about' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Render About tab (<code>options.informationPanel.renderAbout</code>)'),
+        '#default_value' => $this->getSetting('information_panel_render_about'),
+      ],
+      'information_panel_render_annotation' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Render Annotation tab (<code>options.informationPanel.renderAnnotation</code>)'),
+        '#default_value' => $this->getSetting('information_panel_render_annotation'),
+      ],
+      'information_panel_render_supplementing' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Render Supplementing resources tab (<code>options.informationPanel.renderSupplementing</code>)'),
+        '#default_value' => $this->getSetting('information_panel_render_supplementing'),
+      ],
+      'information_panel_render_content_search' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Render Content Search tab (<code>options.informationPanel.renderContentSearch</code>)'),
+        '#default_value' => $this->getSetting('information_panel_render_content_search'),
+      ],
+      'information_panel_default_tab' => [
+        '#type' => 'select',
+        '#title' => $this->t('Default active tab (<code>options.informationPanel.defaultTab</code>)'),
+        '#options' => [
+          '' => $this->t('— Clover default —'),
+          'about' => $this->t('About'),
+          'annotation' => $this->t('Annotation'),
+          'supplementing' => $this->t('Supplementing'),
+          'search' => $this->t('Search'),
+        ],
+        '#default_value' => $this->getSetting('information_panel_default_tab'),
+      ],
+
+      // ----------------------------------------------------------------
+      // Search
+      // ----------------------------------------------------------------
+      'content_search_enabled' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Enable IIIF Content Search (<code>options.contentSearch.enabled</code>)'),
+        '#default_value' => $this->getSetting('content_search_enabled'),
+      ],
+
+      // ----------------------------------------------------------------
+      // Network
+      // ----------------------------------------------------------------
+      'cross_origin' => [
+        '#type' => 'select',
+        '#title' => $this->t('Cross-origin policy (<code>options.crossOrigin</code>)'),
+        '#options' => [
+          'anonymous' => $this->t('anonymous'),
+          'use-credentials' => $this->t('use-credentials'),
+          '' => $this->t('undefined (no CORS header)'),
+        ],
+        '#default_value' => $this->getSetting('cross_origin'),
+      ],
+      'with_credentials' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Include credentials in requests (<code>options.withCredentials</code>)'),
+        '#default_value' => $this->getSetting('with_credentials'),
+      ],
+      'request_headers' => [
+        '#type' => 'textarea',
+        '#title' => $this->t('Custom request headers (<code>options.requestHeaders</code>)'),
+        '#description' => $this->t('JSON object of HTTP headers to include in manifest/resource requests, e.g. <em>{"Authorization": "Bearer token"}</em>. Leave empty for defaults.'),
+        '#default_value' => $this->getSetting('request_headers'),
+        '#rows' => 3,
+        '#element_validate' => [[$this, 'validateJSON']],
+      ],
+
+      // ----------------------------------------------------------------
+      // Advanced overrides
+      // ----------------------------------------------------------------
+      'open_seadragon' => [
+        '#type' => 'textarea',
+        '#title' => $this->t('OpenSeadragon options (<code>options.openSeadragon</code>)'),
+        '#description' => $this->t('JSON object of <a href="https://openseadragon.github.io/docs/OpenSeadragon.html#Options">OpenSeadragon configuration overrides</a>. Leave empty for defaults.'),
+        '#default_value' => $this->getSetting('open_seadragon'),
+        '#rows' => 4,
+        '#element_validate' => [[$this, 'validateJSON']],
+      ],
+      'annotations_motivations' => [
+        '#type' => 'textfield',
+        '#title' => $this->t('Annotation motivations filter (<code>options.annotations.motivations</code>)'),
+        '#description' => $this->t('Comma-separated list of IIIF motivation values to display, e.g. <em>painting,supplementing</em>. Leave empty to show all.'),
+        '#default_value' => $this->getSetting('annotations_motivations'),
+      ],
+      'ignore_caption_labels' => [
+        '#type' => 'textfield',
+        '#title' => $this->t('Ignore caption labels (<code>options.ignoreCaptionLabels</code>)'),
+        '#description' => $this->t('Comma-separated list of caption label strings to exclude from display.'),
+        '#default_value' => $this->getSetting('ignore_caption_labels'),
+      ],
+      'custom_theme' => [
+        '#type' => 'textarea',
+        '#title' => $this->t('Custom theme (<code>customTheme</code>)'),
+        '#description' => $this->t('JSON object of CSS custom property overrides for Clover\'s design tokens. See <a href="https://samvera-labs.github.io/clover-iiif/docs/viewer#custom-theme">Clover theme docs</a>.'),
+        '#default_value' => $this->getSetting('custom_theme'),
+        '#rows' => 4,
+        '#element_validate' => [[$this, 'validateJSON']],
+      ],
+
+      // ----------------------------------------------------------------
+      // Embargo
+      // ----------------------------------------------------------------
       'hide_on_embargo' => [
         '#type' => 'checkbox',
         '#title' => $this->t('Hide the viewer in the presence of an embargo.'),
         '#description' => $this->t('If unchecked, embargo handling is delegated to the IIIF Manifest.'),
         '#default_value' => $this->getSetting('hide_on_embargo') ?? FALSE,
       ],
+
     ] + parent::settingsForm($form, $form_state);
 
     if (empty($options_for_mainsource)) {
@@ -290,16 +458,14 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
       foreach ($this->getSetting('mediasource') as $source => $enabled) {
         $on = (string) $enabled;
         if ($on === 'metadataexposeentity') {
+          $label = '(none set)';
           if ($this->getSetting('metadataexposeentity_source')) {
             $entity = $this->entityTypeManager->getStorage('metadataexpose_entity')
               ->load($this->getSetting('metadataexposeentity_source'));
             $label = $entity ? $entity->label() : $this->getSetting('metadataexposeentity_source') . ' (missing)';
           }
-          else {
-            $label = '(none set)';
-          }
-          $summary[] = $this->t('Manifest from Metadata Expose Endpoint: %label%primary', [
-            '%label' => $label ?? '(none set)',
+          $summary[] = $this->t('Manifest from Endpoint: %label%primary', [
+            '%label' => $label,
             '%primary' => ($main_mediasource === $on) ? ' (PRIMARY)' : '',
           ]);
         }
@@ -319,17 +485,21 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
     }
 
     $max_width = (int) $this->getSetting('max_width');
-    $summary[] = $this->t('Size: %width x %height px | Canvas height: %canvas', [
+    $summary[] = $this->t('Size: %width x %height | Canvas: %canvas', [
       '%width' => $max_width === 0 ? '100%' : $max_width . 'px',
-      '%height' => $this->getSetting('max_height'),
+      '%height' => $this->getSetting('max_height') . 'px',
       '%canvas' => $this->getSetting('canvas_height'),
     ]);
 
-    $summary[] = $this->t('Info panel: %panel | Download: %dl | Background: %bg', [
-      '%panel' => $this->getSetting('information_panel') ? $this->t('on') : $this->t('off'),
-      '%dl' => $this->getSetting('download_enabled') ? $this->t('on') : $this->t('off'),
-      '%bg' => $this->getSetting('background_color'),
-    ]);
+    $flags = [];
+    if (!$this->getSetting('show_title')) $flags[] = 'no title';
+    if (!$this->getSetting('show_iiif_badge')) $flags[] = 'no badge';
+    if (!$this->getSetting('show_download')) $flags[] = 'no download';
+    if (!$this->getSetting('information_panel_open')) $flags[] = 'panel closed';
+    if (!$this->getSetting('content_search_enabled')) $flags[] = 'search off';
+    if (!empty($flags)) {
+      $summary[] = $this->t('Options: @flags', ['@flags' => implode(', ', $flags)]);
+    }
 
     return array_merge($summary, parent::settingsSummary());
   }
@@ -345,6 +515,20 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
     $mediasource = is_array($this->getSetting('mediasource')) ? $this->getSetting('mediasource') : [];
     $main_mediasource = $this->getSetting('main_mediasource');
     $hide_on_embargo = $this->getSetting('hide_on_embargo') ?? FALSE;
+
+    // Parse JSON-textarea settings once, outside the item loop.
+    $open_seadragon = $this->parseJsonSetting('open_seadragon');
+    $request_headers = $this->parseJsonSetting('request_headers');
+    $custom_theme = $this->parseJsonSetting('custom_theme');
+
+    $annotations_motivations = array_values(array_filter(
+      array_map('trim', explode(',', $this->getSetting('annotations_motivations') ?? ''))
+    ));
+    $ignore_caption_labels = array_values(array_filter(
+      array_map('trim', explode(',', $this->getSetting('ignore_caption_labels') ?? ''))
+    ));
+
+    $cross_origin = $this->getSetting('cross_origin');
 
     $embargo_context = [];
     $embargo_tags = [];
@@ -419,17 +603,38 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
             ],
           ];
 
-          $elements[$delta]['media']['#attached']['drupalSettings']['format_strawberryfield']['clover'][$htmlid] = [
+          $clover_settings = [
             'nodeuuid' => $nodeuuid,
             'manifesturl' => $main_manifesturl,
             'width' => $max_width_css,
             'height' => $max_height,
+            // options.*
             'canvas_height' => $this->getSetting('canvas_height'),
-            'information_panel' => (bool) $this->getSetting('information_panel'),
-            'download_enabled' => (bool) $this->getSetting('download_enabled'),
-            'background_color' => $this->getSetting('background_color'),
+            'canvas_background_color' => $this->getSetting('canvas_background_color'),
+            'background' => $this->getSetting('background'),
+            'show_title' => (bool) $this->getSetting('show_title'),
+            'show_iiif_badge' => (bool) $this->getSetting('show_iiif_badge'),
+            'show_download' => (bool) $this->getSetting('show_download'),
+            'cross_origin' => $cross_origin ?: NULL,
+            'with_credentials' => (bool) $this->getSetting('with_credentials'),
+            'request_headers' => $request_headers,
+            'open_seadragon' => $open_seadragon,
+            'annotations_motivations' => $annotations_motivations,
+            'ignore_caption_labels' => $ignore_caption_labels,
+            'content_search_enabled' => (bool) $this->getSetting('content_search_enabled'),
+            // options.informationPanel.*
+            'information_panel_open' => (bool) $this->getSetting('information_panel_open'),
+            'information_panel_render_about' => (bool) $this->getSetting('information_panel_render_about'),
+            'information_panel_render_annotation' => (bool) $this->getSetting('information_panel_render_annotation'),
+            'information_panel_render_supplementing' => (bool) $this->getSetting('information_panel_render_supplementing'),
+            'information_panel_render_content_search' => (bool) $this->getSetting('information_panel_render_content_search'),
+            'information_panel_render_toggle' => (bool) $this->getSetting('information_panel_render_toggle'),
+            'information_panel_default_tab' => $this->getSetting('information_panel_default_tab'),
+            // customTheme (top-level prop, not inside options)
+            'custom_theme' => $custom_theme,
           ];
 
+          $elements[$delta]['media']['#attached']['drupalSettings']['format_strawberryfield']['clover'][$htmlid] = $clover_settings;
           $elements[$delta]['#attached']['library'][] = 'strawberryfield_clover/clover_strawberry';
         }
       }
@@ -471,6 +676,18 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
     }
 
     return $elements;
+  }
+
+  /**
+   * Decodes a JSON textarea setting, returning the decoded value or NULL.
+   */
+  protected function parseJsonSetting(string $key) {
+    $raw = trim($this->getSetting($key) ?? '');
+    if (empty($raw)) {
+      return NULL;
+    }
+    $decoded = json_decode($raw, TRUE);
+    return json_last_error() === JSON_ERROR_NONE ? $decoded : NULL;
   }
 
   /**
