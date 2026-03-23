@@ -1,0 +1,18 @@
+# Self-contained bundle: React 18 + ReactDOM + Swiper + Clover IIIF Viewer.
+# Exposes window.CloverViewer = { Viewer, React, ReactDOM }.
+# Rebuilt via: cd build && npm run build
+clover_iiif:
+  version: 3.4.0
+  js:
+    js/clover-viewer.bundle.js: { minified: true, preprocess: false }
+
+# This mounts Clover as a React App.
+clover_strawberry:
+  version: 1.0
+  js:
+    js/clover_strawberry.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - core/drupalSettings
+    - strawberryfield_clover/clover_iiif

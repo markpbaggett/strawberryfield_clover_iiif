@@ -1,0 +1,9 @@
+name: 'Strawberry Field Clover IIIF'
+type: module
+description: 'Clover IIIF React viewer formatter for Strawberry Fields.'
+core_version_requirement: ^10 || ^11
+package: Archipelago
+dependencies:
+  - drupal:field
+  - format_strawberryfield:format_strawberryfield
+  - strawberryfield:strawberryfield
