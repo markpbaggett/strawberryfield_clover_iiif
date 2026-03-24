@@ -16,3 +16,25 @@ clover_strawberry:
     - core/once
     - core/drupalSettings
     - strawberryfield_clover/clover_iiif
+
+# Mounts Clover Scroll as a React app.
+clover_scroll:
+  version: 1.0
+  js:
+    js/clover_scroll.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - core/drupalSettings
+    - strawberryfield_clover/clover_iiif
+
+# Mounts Clover Slider as a React app.
+clover_slider:
+  version: 1.0
+  js:
+    js/clover_slider.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - core/drupalSettings
+    - strawberryfield_clover/clover_iiif
