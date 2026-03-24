@@ -38,3 +38,14 @@ clover_slider:
     - core/once
     - core/drupalSettings
     - strawberryfield_clover/clover_iiif
+
+# Data-attribute-driven behaviors for mounting Viewer, Scroll, or Slider
+# from any Twig template — no PHP formatter required.
+clover_data_attr:
+  version: 1.0
+  js:
+    js/clover_data_attr.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - strawberryfield_clover/clover_iiif
