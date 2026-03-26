@@ -41,9 +41,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
    */
   protected $entityTypeManager;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(
     $plugin_id,
     $plugin_definition,
@@ -72,9 +69,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
     $this->entityTypeManager = $entity_type_manager;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public static function create(
     ContainerInterface $container,
     array $configuration,
@@ -96,9 +90,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public static function defaultSettings() {
     $settings = parent::defaultSettings();
     unset($settings['hide_on_embargo']);
@@ -111,17 +102,14 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
       'metadataexposeentity_source' => NULL,
       'manifesturl_json_key_source' => 'iiifmanifest',
       'manifestnodelist_json_key_source' => 'isrelatedto',
-      // Dimensions.
       'max_width' => 0,
       'max_height' => 600,
       'canvas_height' => '500px',
-      // Display.
       'background' => '',
       'canvas_background_color' => '#1a1d1e',
       'show_title' => TRUE,
       'show_iiif_badge' => TRUE,
       'show_download' => TRUE,
-      // Information panel.
       'information_panel_open' => TRUE,
       'information_panel_render_about' => TRUE,
       'information_panel_render_annotation' => TRUE,
@@ -129,25 +117,18 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
       'information_panel_render_content_search' => TRUE,
       'information_panel_render_toggle' => TRUE,
       'information_panel_default_tab' => '',
-      // Search.
       'content_search_enabled' => TRUE,
-      // Network.
       'cross_origin' => 'anonymous',
       'with_credentials' => FALSE,
       'request_headers' => '',
-      // Advanced JSON overrides.
       'open_seadragon' => '',
       'annotations_motivations' => '',
       'ignore_caption_labels' => '',
       'custom_theme' => '',
-      // Embargo.
       'hide_on_embargo' => FALSE,
     ];
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $entity = NULL;
     if ($this->getSetting('metadataexposeentity_source')) {
@@ -237,9 +218,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
         ],
       ],
 
-      // ----------------------------------------------------------------
-      // Dimensions
-      // ----------------------------------------------------------------
       'max_width' => [
         '#type' => 'number',
         '#title' => $this->t('Maximum width'),
@@ -270,9 +248,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
         '#required' => TRUE,
       ],
 
-      // ----------------------------------------------------------------
-      // Display
-      // ----------------------------------------------------------------
       'background' => [
         '#type' => 'textfield',
         '#title' => $this->t('Viewer background'),
@@ -303,9 +278,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
         '#default_value' => $this->getSetting('show_download'),
       ],
 
-      // ----------------------------------------------------------------
-      // Information panel
-      // ----------------------------------------------------------------
       'information_panel_open' => [
         '#type' => 'checkbox',
         '#title' => $this->t('Information panel open by default (<code>options.informationPanel.open</code>)'),
@@ -349,18 +321,12 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
         '#default_value' => $this->getSetting('information_panel_default_tab'),
       ],
 
-      // ----------------------------------------------------------------
-      // Search
-      // ----------------------------------------------------------------
       'content_search_enabled' => [
         '#type' => 'checkbox',
         '#title' => $this->t('Enable IIIF Content Search (<code>options.contentSearch.enabled</code>)'),
         '#default_value' => $this->getSetting('content_search_enabled'),
       ],
 
-      // ----------------------------------------------------------------
-      // Network
-      // ----------------------------------------------------------------
       'cross_origin' => [
         '#type' => 'select',
         '#title' => $this->t('Cross-origin policy (<code>options.crossOrigin</code>)'),
@@ -385,9 +351,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
         '#element_validate' => [[$this, 'validateJSON']],
       ],
 
-      // ----------------------------------------------------------------
-      // Advanced overrides
-      // ----------------------------------------------------------------
       'open_seadragon' => [
         '#type' => 'textarea',
         '#title' => $this->t('OpenSeadragon options (<code>options.openSeadragon</code>)'),
@@ -417,9 +380,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
         '#element_validate' => [[$this, 'validateJSON']],
       ],
 
-      // ----------------------------------------------------------------
-      // Embargo
-      // ----------------------------------------------------------------
       'hide_on_embargo' => [
         '#type' => 'checkbox',
         '#title' => $this->t('Hide the viewer in the presence of an embargo.'),
@@ -446,9 +406,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
     return NestedArray::getValue($form, $form_parents);
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function settingsSummary() {
     $summary[] = $this->t('Displays IIIF content using the Clover IIIF React viewer.');
 
@@ -504,9 +461,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
     return array_merge($summary, parent::settingsSummary());
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
     $max_width = $this->getSetting('max_width');
@@ -516,7 +470,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
     $main_mediasource = $this->getSetting('main_mediasource');
     $hide_on_embargo = $this->getSetting('hide_on_embargo') ?? FALSE;
 
-    // Parse JSON-textarea settings once, outside the item loop.
     $open_seadragon = $this->parseJsonSetting('open_seadragon');
     $request_headers = $this->parseJsonSetting('request_headers');
     $custom_theme = $this->parseJsonSetting('custom_theme');
@@ -608,7 +561,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
             'manifesturl' => $main_manifesturl,
             'width' => $max_width_css,
             'height' => $max_height,
-            // options.*
             'canvas_height' => $this->getSetting('canvas_height'),
             'canvas_background_color' => $this->getSetting('canvas_background_color'),
             'background' => $this->getSetting('background'),
@@ -622,7 +574,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
             'annotations_motivations' => $annotations_motivations,
             'ignore_caption_labels' => $ignore_caption_labels,
             'content_search_enabled' => (bool) $this->getSetting('content_search_enabled'),
-            // options.informationPanel.*
             'information_panel_open' => (bool) $this->getSetting('information_panel_open'),
             'information_panel_render_about' => (bool) $this->getSetting('information_panel_render_about'),
             'information_panel_render_annotation' => (bool) $this->getSetting('information_panel_render_annotation'),
@@ -630,7 +581,6 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
             'information_panel_render_content_search' => (bool) $this->getSetting('information_panel_render_content_search'),
             'information_panel_render_toggle' => (bool) $this->getSetting('information_panel_render_toggle'),
             'information_panel_default_tab' => $this->getSetting('information_panel_default_tab'),
-            // customTheme (top-level prop, not inside options)
             'custom_theme' => $custom_theme,
           ];
 

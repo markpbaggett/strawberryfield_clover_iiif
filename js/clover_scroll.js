@@ -52,7 +52,6 @@
           element.style.width = config.width;
         }
 
-        // Build options.figure.
         var figure = {
           display: config.figure_display,
         };

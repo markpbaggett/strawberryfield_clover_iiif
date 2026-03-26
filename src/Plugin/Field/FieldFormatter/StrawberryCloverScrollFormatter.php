@@ -41,9 +41,6 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
    */
   protected $entityTypeManager;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(
     $plugin_id,
     $plugin_definition,
@@ -72,9 +69,6 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
     $this->entityTypeManager = $entity_type_manager;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public static function create(
     ContainerInterface $container,
     array $configuration,
@@ -96,14 +90,10 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public static function defaultSettings() {
     $settings = parent::defaultSettings();
     unset($settings['hide_on_embargo']);
     return $settings + [
-      // Manifest source.
       'mediasource' => [
         'metadataexposeentity' => 'metadataexposeentity',
       ],
@@ -111,21 +101,14 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
       'metadataexposeentity_source' => NULL,
       'manifesturl_json_key_source' => 'iiifmanifest',
       'manifestnodelist_json_key_source' => 'isrelatedto',
-      // Width.
       'max_width' => 0,
-      // Figure options.
       'figure_display' => 'image-viewer',
       'figure_aspect_ratio' => '',
-      // Annotations.
       'annotations_motivations' => '',
-      // Scroll offset.
       'scroll_offset' => 0,
     ];
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $entity = NULL;
     if ($this->getSetting('metadataexposeentity_source')) {
@@ -215,9 +198,6 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
         ],
       ],
 
-      // ----------------------------------------------------------------
-      // Width
-      // ----------------------------------------------------------------
       'max_width' => [
         '#type' => 'number',
         '#title' => $this->t('Maximum width'),
@@ -230,9 +210,6 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
         '#required' => TRUE,
       ],
 
-      // ----------------------------------------------------------------
-      // Figure options
-      // ----------------------------------------------------------------
       'figure_display' => [
         '#type' => 'select',
         '#title' => $this->t('Figure display (<code>options.figure.display</code>)'),
@@ -253,9 +230,6 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
         '#min' => 0,
       ],
 
-      // ----------------------------------------------------------------
-      // Annotations
-      // ----------------------------------------------------------------
       'annotations_motivations' => [
         '#type' => 'textfield',
         '#title' => $this->t('Annotation motivations filter (<code>options.annotations.motivations</code>)'),
@@ -263,9 +237,6 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
         '#default_value' => $this->getSetting('annotations_motivations'),
       ],
 
-      // ----------------------------------------------------------------
-      // Scroll offset
-      // ----------------------------------------------------------------
       'scroll_offset' => [
         '#type' => 'number',
         '#title' => $this->t('Scroll offset (<code>options.offset</code>)'),

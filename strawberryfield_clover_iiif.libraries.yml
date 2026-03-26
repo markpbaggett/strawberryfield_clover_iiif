@@ -6,7 +6,7 @@ clover_iiif:
   js:
     js/clover-viewer.bundle.js: { minified: true, preprocess: false }
 
-# This mounts Clover as a React App.
+# Mounts Clover as a React App.
 clover_strawberry:
   version: 1.0
   js:
@@ -39,8 +39,7 @@ clover_slider:
     - core/drupalSettings
     - strawberryfield_clover/clover_iiif
 
-# Data-attribute-driven behaviors for mounting Viewer, Scroll, or Slider
-# from any Twig template — no PHP formatter required.
+# Allows Data-attribute-driven behaviors for mounting Viewer, Scroll, or Slider in any twig template!!!
 clover_data_attr:
   version: 1.0
   js:

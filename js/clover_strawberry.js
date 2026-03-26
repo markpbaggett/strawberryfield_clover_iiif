@@ -70,13 +70,11 @@
 
         const { Viewer, React, ReactDOM } = window.CloverViewer;
 
-        // Apply dimensions to the container.
         element.style.height = config.height + 'px';
         if (config.width !== '100%') {
           element.style.width = config.width;
         }
 
-        // Build the options object from config.
         var options = {
           canvasHeight: config.canvas_height,
           canvasBackgroundColor: config.canvas_background_color,
@@ -128,13 +126,11 @@
           options.informationPanel.defaultTab = config.information_panel_default_tab;
         }
 
-        // Build the top-level props for the Viewer component.
         var viewerProps = {
           iiifContent: config.manifesturl,
           options: options,
         };
 
-        // customTheme is a top-level prop, not inside options.
         if (config.custom_theme && typeof config.custom_theme === 'object') {
           viewerProps.customTheme = config.custom_theme;
         }

@@ -76,9 +76,6 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
     $this->entityTypeManager = $entity_type_manager;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public static function create(
     ContainerInterface $container,
     array $configuration,
@@ -100,31 +97,22 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public static function defaultSettings() {
     $settings = parent::defaultSettings();
     unset($settings['hide_on_embargo']);
     return $settings + [
-      // Collection source (metadataexposeentity or manifesturl only).
       'mediasource' => [
         'metadataexposeentity' => 'metadataexposeentity',
       ],
       'main_mediasource' => 'metadataexposeentity',
       'metadataexposeentity_source' => NULL,
       'manifesturl_json_key_source' => 'iiifcollection',
-      // Width.
       'max_width' => 0,
-      // Slider options.
       'credentials' => 'omit',
       'custom_view_all' => '',
     ];
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $entity = NULL;
     if ($this->getSetting('metadataexposeentity_source')) {
@@ -162,9 +150,6 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
 
     $settings_form = [
 
-      // ----------------------------------------------------------------
-      // Collection source
-      // ----------------------------------------------------------------
       'mediasource' => [
         '#type' => 'checkboxes',
         '#title' => $this->t('Source for your IIIF Collection URL.'),
@@ -205,9 +190,6 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
         ],
       ],
 
-      // ----------------------------------------------------------------
-      // Width
-      // ----------------------------------------------------------------
       'max_width' => [
         '#type' => 'number',
         '#title' => $this->t('Maximum width'),
@@ -220,9 +202,6 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
         '#required' => TRUE,
       ],
 
-      // ----------------------------------------------------------------
-      // Slider options
-      // ----------------------------------------------------------------
       'credentials' => [
         '#type' => 'select',
         '#title' => $this->t('Fetch credentials (<code>options.credentials</code>)'),
@@ -250,7 +229,7 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
   }
 
   /**
-   * Ajax callback for mediasource checkboxes.
+   * Add an Ajax callback
    */
   public static function ajaxCallbackMainSource(array $form, FormStateInterface $form_state) {
     $form_parents = $form_state->getTriggeringElement()['#array_parents'];
@@ -259,9 +238,6 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
     return NestedArray::getValue($form, $form_parents);
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function settingsSummary() {
     $summary[] = $this->t('Displays a IIIF Collection using the Clover IIIF Slider component.');
 
@@ -300,9 +276,6 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
     return array_merge($summary, parent::settingsSummary());
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
     $max_width = $this->getSetting('max_width');
