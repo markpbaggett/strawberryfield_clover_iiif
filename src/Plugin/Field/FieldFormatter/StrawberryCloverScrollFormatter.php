@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\strawberryfield_clover\Plugin\Field\FieldFormatter;
+namespace Drupal\strawberryfield_clover_iiif\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @FieldFormatter(
  *   id = "strawberry_clover_scroll_formatter",
  *   label = @Translation("Strawberry Field Clover IIIF Scroll"),
- *   class = "\Drupal\strawberryfield_clover\Plugin\Field\FieldFormatter\StrawberryCloverScrollFormatter",
+ *   class = "\Drupal\strawberryfield_clover_iiif\Plugin\Field\FieldFormatter\StrawberryCloverScrollFormatter",
  *   field_types = {
  *     "strawberryfield_field"
  *   },
@@ -396,7 +396,7 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
         ];
 
         $elements[$delta]['media']['#attached']['drupalSettings']['format_strawberryfield']['clover_scroll'][$htmlid] = $scroll_settings;
-        $elements[$delta]['#attached']['library'][] = 'strawberryfield_clover/clover_scroll';
+        $elements[$delta]['#attached']['library'][] = 'strawberryfield_clover_iiif/clover_scroll';
       }
 
       if (empty($elements[$delta])) {

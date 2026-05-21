@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\strawberryfield_clover\Plugin\Field\FieldFormatter;
+namespace Drupal\strawberryfield_clover_iiif\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @FieldFormatter(
  *   id = "strawberry_clover_formatter",
  *   label = @Translation("Strawberry Field Clover IIIF Viewer"),
- *   class = "\Drupal\strawberryfield_clover\Plugin\Field\FieldFormatter\StrawberryCloverFormatter",
+ *   class = "\Drupal\strawberryfield_clover_iiif\Plugin\Field\FieldFormatter\StrawberryCloverFormatter",
  *   field_types = {
  *     "strawberryfield_field"
  *   },
@@ -585,7 +585,7 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
           ];
 
           $elements[$delta]['media']['#attached']['drupalSettings']['format_strawberryfield']['clover'][$htmlid] = $clover_settings;
-          $elements[$delta]['#attached']['library'][] = 'strawberryfield_clover/clover_strawberry';
+          $elements[$delta]['#attached']['library'][] = 'strawberryfield_clover_iiif/clover_strawberry';
         }
       }
 

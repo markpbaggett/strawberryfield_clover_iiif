@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\strawberryfield_clover\Plugin\Field\FieldFormatter;
+namespace Drupal\strawberryfield_clover_iiif\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -27,7 +27,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @FieldFormatter(
  *   id = "strawberry_clover_slider_formatter",
  *   label = @Translation("Strawberry Field Clover IIIF Slider"),
- *   class = "\Drupal\strawberryfield_clover\Plugin\Field\FieldFormatter\StrawberryCloverSliderFormatter",
+ *   class = "\Drupal\strawberryfield_clover_iiif\Plugin\Field\FieldFormatter\StrawberryCloverSliderFormatter",
  *   field_types = {
  *     "strawberryfield_field"
  *   },
@@ -345,7 +345,7 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
         ];
 
         $elements[$delta]['media']['#attached']['drupalSettings']['format_strawberryfield']['clover_slider'][$htmlid] = $slider_settings;
-        $elements[$delta]['#attached']['library'][] = 'strawberryfield_clover/clover_slider';
+        $elements[$delta]['#attached']['library'][] = 'strawberryfield_clover_iiif/clover_slider';
       }
 
       if (empty($elements[$delta])) {
