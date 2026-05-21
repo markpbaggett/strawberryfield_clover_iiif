@@ -2,7 +2,7 @@
 # Exposes window.CloverViewer = { Viewer, React, ReactDOM }.
 # Rebuilt via: cd build && npm run build
 clover_iiif:
-  version: 3.4.0
+  version: 3.9.2
   js:
     js/clover-viewer.bundle.js: { minified: true, preprocess: false }
 
