@@ -17,6 +17,21 @@ Archipelago.
 - [Strawberry Field](https://github.com/esmero/strawberryfield) module
 - [Format Strawberry Field](https://github.com/esmero/format_strawberryfield) module
 
+## Installation
+
+1. Copy this module into your Drupal site's modules directory:
+   ```shell
+   cp -r strawberryfield_clover_iiif /path/to/drupal/web/modules/contrib/
+   ```
+
+2. Enable the module via Drush:
+   ```shell
+   drush en strawberryfield_clover_iiif
+   ```
+   Or enable it through the Drupal admin UI at **Extend** (`/admin/modules`).
+
+The `strawberryfield` and `format_strawberryfield` modules must already be installed before enabling this module.
+
 ## Rebuilding the JavaScript Bundle
 
 The Clover IIIF viewer is bundled as a self-contained UMD library. To rebuild after updating dependencies:
