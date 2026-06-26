@@ -137,6 +137,22 @@
 
         const root = ReactDOM.createRoot(element);
         root.render(React.createElement(Viewer, viewerProps));
+
+        // OSD initializes its coordinate system synchronously when the canvas
+        // first renders, but React's layout may not have reached its final
+        // dimensions yet. Watch for the OSD canvas to appear, then force a
+        // resize so OSD recalculates viewport coordinates against the actual
+        // rendered size. Without this, annotation bounding boxes are offset
+        // until the user manually zooms.
+        var observer = new MutationObserver(function(mutations, obs) {
+          if (element.querySelector('.openseadragon-container')) {
+            obs.disconnect();
+            requestAnimationFrame(function() {
+              window.dispatchEvent(new Event('resize'));
+            });
+          }
+        });
+        observer.observe(element, { childList: true, subtree: true });
       });
     }
   };
