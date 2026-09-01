@@ -14,9 +14,12 @@
  *      data-show-title="true"
  *      data-show-iiif-badge="true"
  *      data-show-download="true"
+ *      data-show-resource-icons="true"
+ *      data-render-canvas-summary="true"
  *      data-information-panel-open="true"
  *      data-content-search-enabled="true"
  *      data-cross-origin="anonymous"
+ *      data-custom-css-variables="--clover-color-primary: #ff0000; --clover-radius: 5px;"
  *      data-height="600">
  * </div>
  *
@@ -32,7 +35,8 @@
  * <div class="clover-twig-slider"
  *      data-iiif-collection="https://example.com/collection.json"
  *      data-credentials="omit"
- *      data-custom-view-all="https://example.com/browse">
+ *      data-custom-view-all="https://example.com/browse"
+ *      data-search="true">
  * </div>
  *
  * All data attributes are optional except the manifest/collection URL.
@@ -79,6 +83,12 @@
           const { Viewer, React, ReactDOM } = window.CloverViewer;
           const d = element.dataset;
 
+          var elementId = element.getAttribute('id');
+          if (!elementId) {
+            elementId = 'clover-twig-viewer-' + Date.now();
+            element.setAttribute('id', elementId);
+          }
+
           var height = parseInt(d.height, 10) || 600;
           element.style.height = height + 'px';
 
@@ -100,7 +110,32 @@
           var crossOrigin = dataStr(element, 'crossOrigin', 'anonymous');
           if (crossOrigin) options.crossOrigin = crossOrigin;
 
+          if (dataBool(element, 'showResourceIcons', false)) {
+            options.showResourceIcons = true;
+          }
+
+          if (dataBool(element, 'renderCanvasSummary', false)) {
+            if (typeof options.informationPanel === 'undefined') {
+              options.informationPanel = {};
+            }
+            options.informationPanel.renderCanvasSummary = true;
+          }
+
           var props = { iiifContent: d.iiifManifest, options: options };
+
+          var cssVars = dataStr(element, 'customCssVariables', '');
+          if (cssVars) {
+            var styleId = 'clover-css-vars-' + elementId;
+            var styleEl = document.getElementById(styleId);
+            if (!styleEl) {
+              styleEl = document.createElement('style');
+              styleEl.id = styleId;
+              styleEl.textContent = '#' + elementId + ' {' + cssVars + '}';
+              element.parentNode.insertBefore(styleEl, element);
+            } else {
+              styleEl.textContent = '#' + elementId + ' {' + cssVars + '}';
+            }
+          }
 
           ReactDOM.createRoot(element).render(React.createElement(Viewer, props));
         });
@@ -159,6 +194,7 @@
           if (viewAll) options.customViewAll = viewAll;
 
           var props = { iiifContent: element.dataset.iiifCollection };
+          props.search = dataBool(element, 'search', false);
           if (Object.keys(options).length > 0) props.options = options;
 
           ReactDOM.createRoot(element).render(React.createElement(Slider, props));

@@ -11,6 +11,7 @@
  *     width:          string  (e.g. '100%' or '720px'),
  *     credentials:    string  ('omit' | 'same-origin' | 'include'),
  *     custom_view_all: string|null,
+ *     search:         boolean,
  *   }
  */
 (function (Drupal, once, drupalSettings) {
@@ -64,6 +65,7 @@
 
         var sliderProps = {
           iiifContent: config.collectionurl,
+          search: config.search,
         };
 
         if (Object.keys(options).length > 0) {
