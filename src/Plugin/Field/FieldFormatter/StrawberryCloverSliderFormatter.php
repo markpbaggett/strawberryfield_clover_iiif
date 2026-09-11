@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Clover IIIF Slider Strawberry Field formatter.
  *
- * Renders a IIIF Collection as a horizontally scrolling Swiper carousel.
+ * Renders a IIIF Collection as a horizontally scrolling carousel (Embla Carousel).
  * The iiifContent prop must point to a IIIF Collection manifest; use a
  * Metadata Display endpoint that outputs a Collection, or store a
  * Collection URL directly in a Strawberry Field JSON key.
@@ -110,6 +110,7 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
       'max_width' => 0,
       'credentials' => 'omit',
       'custom_view_all' => '',
+      'search' => FALSE,
     ];
   }
 
@@ -218,6 +219,12 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
         '#description' => $this->t('URL to use for the "View all" link that appears at the end of the slider. Leave empty for default behavior.'),
         '#default_value' => $this->getSetting('custom_view_all'),
       ],
+      'search' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Enable item search/filter (<code>search</code>)'),
+        '#description' => $this->t('Renders a filter input above the slider rail that lets users search items by title.'),
+        '#default_value' => $this->getSetting('search'),
+      ],
 
     ] + parent::settingsForm($form, $form_state);
 
@@ -272,6 +279,10 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
       '%width' => $max_width === 0 ? '100%' : $max_width . 'px',
       '%creds' => $this->getSetting('credentials'),
     ]);
+
+    if ($this->getSetting('search')) {
+      $summary[] = $this->t('Item search/filter enabled.');
+    }
 
     return array_merge($summary, parent::settingsSummary());
   }
@@ -342,6 +353,7 @@ class StrawberryCloverSliderFormatter extends StrawberryBaseFormatter implements
           'width' => $max_width_css,
           'credentials' => $this->getSetting('credentials'),
           'custom_view_all' => $this->getSetting('custom_view_all') ?: NULL,
+          'search' => (bool) $this->getSetting('search'),
         ];
 
         $elements[$delta]['media']['#attached']['drupalSettings']['format_strawberryfield']['clover_slider'][$htmlid] = $slider_settings;

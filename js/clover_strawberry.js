@@ -18,6 +18,8 @@
  *     show_title:                         boolean,
  *     show_iiif_badge:                    boolean,
  *     show_download:                      boolean,
+ *     show_resource_icons:                boolean,
+ *     render_canvas_summary:              boolean,
  *     cross_origin:                       string|null,
  *     with_credentials:                   boolean,
  *     request_headers:                    object|null,
@@ -33,6 +35,7 @@
  *     information_panel_render_toggle:    boolean,
  *     information_panel_default_tab:      string,
  *     custom_theme:                       object|null,
+ *     custom_css_variables:               string,
  *   }
  */
 (function (Drupal, once, drupalSettings) {
@@ -126,6 +129,17 @@
           options.informationPanel.defaultTab = config.information_panel_default_tab;
         }
 
+        if (config.show_resource_icons) {
+          options.showResourceIcons = true;
+        }
+
+        if (config.render_canvas_summary) {
+          if (typeof options.informationPanel === 'undefined') {
+            options.informationPanel = {};
+          }
+          options.informationPanel.renderCanvasSummary = true;
+        }
+
         var viewerProps = {
           iiifContent: config.manifesturl,
           options: options,
@@ -133,6 +147,20 @@
 
         if (config.custom_theme && typeof config.custom_theme === 'object') {
           viewerProps.customTheme = config.custom_theme;
+          console.warn('Clover IIIF: the customTheme prop is deprecated in favor of CSS custom properties. Use the "Custom CSS variables" setting instead.');
+        }
+
+        if (config.custom_css_variables) {
+          var styleId = 'clover-css-vars-' + elementId;
+          var styleEl = document.getElementById(styleId);
+          if (!styleEl) {
+            styleEl = document.createElement('style');
+            styleEl.id = styleId;
+            styleEl.textContent = '#' + elementId + ' {' + config.custom_css_variables + '}';
+            element.parentNode.insertBefore(styleEl, element);
+          } else {
+            styleEl.textContent = '#' + elementId + ' {' + config.custom_css_variables + '}';
+          }
         }
 
         const root = ReactDOM.createRoot(element);

@@ -1,8 +1,8 @@
-# Self-contained bundle: React 18 + ReactDOM + Swiper + Clover IIIF Viewer.
+# Self-contained bundle: React 18 + ReactDOM + Embla Carousel + OpenSeadragon 6 + Clover IIIF Viewer.
 # Exposes window.CloverViewer = { Viewer, React, ReactDOM }.
 # Rebuilt via: cd build && npm run build
 clover_iiif:
-  version: 3.9.2
+  version: 3.16.0
   js:
     js/clover-viewer.bundle.js: { minified: true, preprocess: false }
 

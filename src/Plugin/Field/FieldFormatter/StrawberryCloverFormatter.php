@@ -20,6 +20,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Clover IIIF React Viewer Strawberry Field formatter.
  *
+ * Renders a IIIF Manifest using the Clover IIIF Viewer component, which uses
+ * OpenSeadragon to provide a zoomable image viewing experience.
+ *
  * @FieldFormatter(
  *   id = "strawberry_clover_formatter",
  *   label = @Translation("Strawberry Field Clover IIIF Viewer"),
@@ -125,6 +128,9 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
       'annotations_motivations' => '',
       'ignore_caption_labels' => '',
       'custom_theme' => '',
+      'custom_css_variables' => '',
+      'show_resource_icons' => FALSE,
+      'render_canvas_summary' => FALSE,
       'hide_on_embargo' => FALSE,
     ];
   }
@@ -277,6 +283,12 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
         '#title' => $this->t('Show download button (<code>options.showDownload</code>)'),
         '#default_value' => $this->getSetting('show_download'),
       ],
+      'show_resource_icons' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Show resource icons (<code>options.showResourceIcons</code>)'),
+        '#description' => $this->t('Displays type badges (video, audio, PDF, etc.) on thumbnails for time-based canvases.'),
+        '#default_value' => $this->getSetting('show_resource_icons'),
+      ],
 
       'information_panel_open' => [
         '#type' => 'checkbox',
@@ -307,6 +319,12 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
         '#type' => 'checkbox',
         '#title' => $this->t('Render Content Search tab (<code>options.informationPanel.renderContentSearch</code>)'),
         '#default_value' => $this->getSetting('information_panel_render_content_search'),
+      ],
+      'render_canvas_summary' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Render canvas summary (<code>options.informationPanel.renderCanvasSummary</code>)'),
+        '#description' => $this->t('Displays the canvas summary text in the Information Panel\'s About tab.'),
+        '#default_value' => $this->getSetting('render_canvas_summary'),
       ],
       'information_panel_default_tab' => [
         '#type' => 'select',
@@ -374,10 +392,17 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
       'custom_theme' => [
         '#type' => 'textarea',
         '#title' => $this->t('Custom theme (<code>customTheme</code>)'),
-        '#description' => $this->t('JSON object of CSS custom property overrides for Clover\'s design tokens. See <a href="https://samvera-labs.github.io/clover-iiif/docs/viewer#custom-theme">Clover theme docs</a>.'),
+        '#description' => $this->t('<strong>Deprecated in Clover 3.16.0.</strong> Use CSS custom properties (<code>--clover-color-*</code>) via the "Custom CSS variables" setting below instead. JSON object of CSS custom property overrides for Clover\'s design tokens. See <a href="https://samvera-labs.github.io/clover-iiif/docs/viewer#custom-theme">Clover theme docs</a>.'),
         '#default_value' => $this->getSetting('custom_theme'),
         '#rows' => 4,
         '#element_validate' => [[$this, 'validateJSON']],
+      ],
+      'custom_css_variables' => [
+        '#type' => 'textarea',
+        '#title' => $this->t('Custom CSS variables'),
+        '#description' => $this->t('Raw CSS custom property declarations scoped to this viewer instance, e.g. <code>--clover-color-primary: #ff0000;</code> or <code>--clover-color-accent: #0065C3; --clover-radius: 5px;</code>. Available variables: <code>--clover-color-primary</code>, <code>--clover-color-primary-muted</code>, <code>--clover-color-primary-alt</code>, <code>--clover-color-accent</code>, <code>--clover-color-accent-muted</code>, <code>--clover-color-accent-alt</code>, <code>--clover-color-secondary</code>, <code>--clover-color-secondary-muted</code>, <code>--clover-color-secondary-alt</code>, <code>--clover-radius</code>, <code>--clover-radius-pill</code>, <code>--clover-thumbnail-width</code>, <code>--clover-thumbnail-height</code>. See <a href="https://samvera-labs.github.io/clover-iiif/docs/viewer#css-custom-properties">Clover CSS custom properties docs</a>.'),
+        '#default_value' => $this->getSetting('custom_css_variables'),
+        '#rows' => 3,
       ],
 
       'hide_on_embargo' => [
@@ -452,8 +477,11 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
     if (!$this->getSetting('show_title')) $flags[] = 'no title';
     if (!$this->getSetting('show_iiif_badge')) $flags[] = 'no badge';
     if (!$this->getSetting('show_download')) $flags[] = 'no download';
+    if ($this->getSetting('show_resource_icons')) $flags[] = 'resource icons';
+    if ($this->getSetting('render_canvas_summary')) $flags[] = 'canvas summary';
     if (!$this->getSetting('information_panel_open')) $flags[] = 'panel closed';
     if (!$this->getSetting('content_search_enabled')) $flags[] = 'search off';
+    if (!empty($this->getSetting('custom_css_variables'))) $flags[] = 'custom CSS vars';
     if (!empty($flags)) {
       $summary[] = $this->t('Options: @flags', ['@flags' => implode(', ', $flags)]);
     }
@@ -473,6 +501,7 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
     $open_seadragon = $this->parseJsonSetting('open_seadragon');
     $request_headers = $this->parseJsonSetting('request_headers');
     $custom_theme = $this->parseJsonSetting('custom_theme');
+    $custom_css_variables = trim($this->getSetting('custom_css_variables') ?? '');
 
     $annotations_motivations = array_values(array_filter(
       array_map('trim', explode(',', $this->getSetting('annotations_motivations') ?? ''))
@@ -582,6 +611,9 @@ class StrawberryCloverFormatter extends StrawberryBaseFormatter implements Conta
             'information_panel_render_toggle' => (bool) $this->getSetting('information_panel_render_toggle'),
             'information_panel_default_tab' => $this->getSetting('information_panel_default_tab'),
             'custom_theme' => $custom_theme,
+            'custom_css_variables' => $this->getSetting('custom_css_variables') ?: '',
+            'show_resource_icons' => (bool) $this->getSetting('show_resource_icons'),
+            'render_canvas_summary' => (bool) $this->getSetting('render_canvas_summary'),
           ];
 
           $elements[$delta]['media']['#attached']['drupalSettings']['format_strawberryfield']['clover'][$htmlid] = $clover_settings;
