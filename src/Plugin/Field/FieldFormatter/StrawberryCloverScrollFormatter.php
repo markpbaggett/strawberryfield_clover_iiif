@@ -106,6 +106,9 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
       'figure_aspect_ratio' => '',
       'annotations_motivations' => '',
       'scroll_offset' => 0,
+      'language_enabled' => FALSE,
+      'language_default_languages' => '',
+      'language_options' => '',
     ];
   }
 
@@ -246,6 +249,32 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
         '#min' => 0,
       ],
 
+      'language_enabled' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Enable language filter (<code>options.language.enabled</code>)'),
+        '#description' => $this->t('Shows a language dropdown that lets users filter annotation body resources by language.'),
+        '#default_value' => $this->getSetting('language_enabled'),
+        '#attributes' => ['data-clover-scroll-selector' => 'language_enabled'],
+      ],
+      'language_default_languages' => [
+        '#type' => 'textfield',
+        '#title' => $this->t('Default languages (<code>options.language.defaultLanguages</code>)'),
+        '#description' => $this->t('Comma-separated list of language codes selected by default, e.g. <em>en,ar</em>. Leave empty to show all languages available in the Manifest.'),
+        '#default_value' => $this->getSetting('language_default_languages'),
+        '#states' => [
+          'visible' => [':input[data-clover-scroll-selector="language_enabled"]' => ['checked' => TRUE]],
+        ],
+      ],
+      'language_options' => [
+        '#type' => 'textfield',
+        '#title' => $this->t('Language options (<code>options.language.options</code>)'),
+        '#description' => $this->t('Comma-separated list of <em>code:Label</em> pairs, e.g. <em>en:English,ar:Arabic</em>. Leave empty to let Clover derive labels from the codes it finds.'),
+        '#default_value' => $this->getSetting('language_options'),
+        '#states' => [
+          'visible' => [':input[data-clover-scroll-selector="language_enabled"]' => ['checked' => TRUE]],
+        ],
+      ],
+
     ] + parent::settingsForm($form, $form_state);
 
     if (empty($options_for_mainsource)) {
@@ -309,6 +338,10 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
       '%display' => $this->getSetting('figure_display'),
     ]);
 
+    if ($this->getSetting('language_enabled')) {
+      $summary[] = $this->t('Language filter enabled');
+    }
+
     return array_merge($summary, parent::settingsSummary());
   }
 
@@ -327,6 +360,24 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
     ));
 
     $figure_aspect_ratio = (float) $this->getSetting('figure_aspect_ratio');
+
+    $language_enabled = (bool) $this->getSetting('language_enabled');
+    $language_default_languages = array_values(array_filter(
+      array_map('trim', explode(',', $this->getSetting('language_default_languages') ?? ''))
+    ));
+    $language_options = [];
+    foreach (explode(',', $this->getSetting('language_options') ?? '') as $pair) {
+      $pair = trim($pair);
+      if ($pair === '' || strpos($pair, ':') === FALSE) {
+        continue;
+      }
+      [$code, $label] = explode(':', $pair, 2);
+      $code = trim($code);
+      $label = trim($label);
+      if ($code !== '' && $label !== '') {
+        $language_options[$code] = $label;
+      }
+    }
 
     $embargo_context = [];
     $embargo_tags = [];
@@ -393,6 +444,9 @@ class StrawberryCloverScrollFormatter extends StrawberryBaseFormatter implements
           'figure_aspect_ratio' => $figure_aspect_ratio > 0 ? $figure_aspect_ratio : NULL,
           'annotations_motivations' => $annotations_motivations,
           'scroll_offset' => (int) $this->getSetting('scroll_offset'),
+          'language_enabled' => $language_enabled,
+          'language_default_languages' => $language_default_languages,
+          'language_options' => $language_options,
         ];
 
         $elements[$delta]['media']['#attached']['drupalSettings']['format_strawberryfield']['clover_scroll'][$htmlid] = $scroll_settings;

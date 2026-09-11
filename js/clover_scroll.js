@@ -11,6 +11,9 @@
  *     figure_aspect_ratio:    number|null,
  *     annotations_motivations: string[],
  *     scroll_offset:          number,
+ *     language_enabled:          boolean,
+ *     language_default_languages: string[],
+ *     language_options:          {[code: string]: string},
  *   }
  */
 (function (Drupal, once, drupalSettings) {
@@ -69,6 +72,27 @@
 
         if (config.annotations_motivations && config.annotations_motivations.length > 0) {
           options.annotations = { motivations: config.annotations_motivations };
+        }
+
+        if (config.language_enabled) {
+          var language = { enabled: true };
+
+          if (config.language_default_languages && config.language_default_languages.length > 0) {
+            language.defaultLanguages = config.language_default_languages;
+          }
+
+          if (config.language_options) {
+            var languageOptions = Object.keys(config.language_options).map(function (code) {
+              var entry = {};
+              entry[code] = config.language_options[code];
+              return entry;
+            });
+            if (languageOptions.length > 0) {
+              language.options = languageOptions;
+            }
+          }
+
+          options.language = language;
         }
 
         var scrollProps = {
