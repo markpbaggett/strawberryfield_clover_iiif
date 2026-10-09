@@ -39,6 +39,19 @@
 
   'use strict';
 
+  // The formatter's "Default active tab" values, as Clover's information
+  // panel names its tabs. Clover 3 only opens a tab it knows; with any other
+  // value it falls back to About, and with About not rendered no tab is
+  // active at all. Values Clover already uses pass through unchanged.
+  var DEFAULT_TABS = {
+    about: 'manifest-about',
+    annotation: 'manifest-annotations',
+    // Supplementing resources (WebVTT transcripts) are listed on the
+    // Annotations tab.
+    supplementing: 'manifest-annotations',
+    search: 'manifest-content-search'
+  };
+
   Drupal.behaviors.strawberryfield_clover_initiate = {
     attach: function (context, settings) {
 
@@ -123,7 +136,9 @@
         }
 
         if (config.information_panel_default_tab) {
-          options.informationPanel.defaultTab = config.information_panel_default_tab;
+          options.informationPanel.defaultTab =
+            DEFAULT_TABS[config.information_panel_default_tab] ||
+            config.information_panel_default_tab;
         }
 
         var viewerProps = {
